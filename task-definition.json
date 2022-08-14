@@ -1,0 +1,77 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-west-1:489994096722:task-definition/ecsdemoflaskapp:2",
+    "containerDefinitions": [
+        {
+            "name": "flask",
+            "image": "489994096722.dkr.ecr.us-west-1.amazonaws.com/ecsdemo:0e8110d",
+            "cpu": 0,
+            "memoryReservation": 500,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 5000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/ecsdemoflaskapp",
+                    "awslogs-region": "us-west-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "ecsdemoflaskapp",
+    "executionRoleArn": "arn:aws:iam::489994096722:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 2,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "registeredAt": "2022-08-14T04:46:37.327000+05:00",
+    "registeredBy": "arn:aws:iam::489994096722:user/shanawar"
+}
