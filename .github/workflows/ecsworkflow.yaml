@@ -8,17 +8,19 @@ env:
   ECS_TASK_DEFINITION_NAME: "ecsdemoflaskapp"         # set this to your Amazon ECS Task Definition name  
   ECS_SERVICE: "demo1"                                # set this to your Amazon ECS service name
   ECS_CLUSTER: "ecsdemo"                              # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: "task-definition.json"         # set this to the path to your Amazon ECS task definition
+  ECS_TASK_DEFINITION: "task-definition.json"         # set this to the path to your Amazon ECS task definition path
   CONTAINER_NAME: "flask"                             # set this to the name of the container 
 
 jobs:
   DeploytoECS:
+#   This runs on Github hosted runner based on ubuntu distro
     runs-on: ubuntu-latest
-    
+#   Clone Repo
     steps:  
     - name: Checkout
       uses: actions/checkout@v3
-    
+
+#   Configure AWS. Pass secrets in settings of repo  
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -26,19 +28,23 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+#   Check if ECR repo exists otherwise create new
     - name: Check Repo and create if doesn't exist
       run:  aws ecr describe-repositories --repository-names $ECR_REPOSITORY || aws ecr create-repository --repository-name $ECR_REPOSITORY
 
+#   Log in to ECR
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+#   Get Git Commit Id for Image Tag so that it is easier to rollback to previous versions 
     - name: Get Commit ID for Image Tag
       id: sha
       run: echo "::set-output name=trim_SHA::$(git rev-parse --short HEAD)"
     - name: Check outputs
       run: echo ${{ steps.sha.outputs.trim_SHA }}
 
+#   Build Docker image from Dockerfile in directory and push to ECR
     - name: Build Image and push to ECR
       id: build-image
       env:
@@ -49,10 +55,12 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
+#   Download Your task definition and output it in repo
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION_NAME --query taskDefinition > task-definition.json
-    
+
+#   Create New Task Definition revision with New Docker Image Build in Previous steps
     - name: Update Task Def with New Docker Image built
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -61,6 +69,7 @@ jobs:
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
+#   Update Service with new task definition 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
