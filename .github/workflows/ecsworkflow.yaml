@@ -5,10 +5,10 @@ on:
 env:
   AWS_REGION: "us-west-1"                   
   ECR_REPOSITORY: "ecsdemo"          
-  ECS_SERVICE: "demo1"                            # set this to your Amazon ECS service name
-  ECS_CLUSTER: "ecsdemo"                          # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: "ecsdemoflaskapp"          # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME: "flask"                         # set this to the name of the container 
+  ECS_SERVICE: "demo1"                                # set this to your Amazon ECS service name
+  ECS_CLUSTER: "ecsdemo"                              # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: "task-definition.json"         # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME: "flask"                             # set this to the name of the container 
 
 jobs:
   DeploytoECS:
@@ -48,7 +48,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: render task def
+    - name: Render Task Def
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
