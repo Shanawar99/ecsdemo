@@ -3,8 +3,9 @@ on:
   push:
     branches: [ master ]
 env:
-  AWS_REGION: "us-west-1"                   
-  ECR_REPOSITORY: "ecsdemo"          
+  AWS_REGION: "us-west-1"                             # set this to your AWS Region
+  ECR_REPOSITORY: "ecsdemo"                           # set this to your Amazon ECR repo name
+  ECS_TASK_DEFINITION_NAME: "ecsdemoflaskapp"         # set this to your Amazon ECS Task Definition name  
   ECS_SERVICE: "demo1"                                # set this to your Amazon ECS service name
   ECS_CLUSTER: "ecsdemo"                              # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: "task-definition.json"         # set this to the path to your Amazon ECS task definition
@@ -48,7 +49,11 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: Render Task Def
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION_NAME --query taskDefinition > task-definition.json
+    
+    - name: Update Task Def with New Docker Image built
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
