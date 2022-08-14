@@ -41,8 +41,6 @@ jobs:
     - name: Get Commit ID for Image Tag
       id: sha
       run: echo "::set-output name=trim_SHA::$(git rev-parse --short HEAD)"
-    - name: Check outputs
-      run: echo ${{ steps.sha.outputs.trim_SHA }}
 
 #   Build Docker image from Dockerfile in directory and push to ECR
     - name: Build Image and push to ECR
